@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card profile-card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <div class="profile-image-wrapper mb-3">
+        {% if profile.profile_image %}
+        <img class="rounded-circle mb-3" style="width: 150px; height: 150px;" src="{{ profile.profile_image.url }}" alt="Profile Picture">
+        {% else %}
+        <img class="rounded-circle mb-3" style="width: 150px; height: 150px;" src="{% static 'images/default_profile_pic.png' %}" alt="Profile Picture">
+        {% endif %}
+      </div>
+      
+      {% if profile %}
+      <h1 class="card-title display-5">{{ profile.user.username|capfirst }}</h1>
+      {% endif %}
+      
+      {% if profile.profile_bio %}
+      <p class="text lead text-center">{{ profile.profile_bio }}</p>
+      {% endif %}
+      
+      <div class="social-icons my-3">
+        {% if profile.profile_link %}
+        <a href="{{ profile.profile_link }}" target="_blank" class="mx-2"><i class="fa-solid fa-link fa-lg"></i></a>
+        {% endif %}
+        {% if profile.instagram_link %}
+        <a href="{{ profile.instagram_link }}" target="_blank" class="mx-2"><i class="fa-brands fa-instagram fa-lg"></i></a>
+        {% endif %}
+        {% if profile.facebook_link %}
+        <a href="{{ profile.facebook_link }}" target="_blank" class="mx-2"><i class="fa-brands fa-facebook-f fa-lg"></i></a>
+        {% endif %}
+        {% if profile.linkdlen_link %}
+        <a href="{{ profile.linkdlen_link }}" target="_blank" class="mx-2"><i class="fa-brands fa-linkedin fa-lg"></i></a>
+        {% endif %}
+      </div>
+      
+      <div class="row text-center my-3">
+        <div class="col-6 border-end">
+          <h4 class="mb-0">{{ profile.followed_by.count }}</h4>
+          <small class="text-muted">
+            <a href="{% url 'followers' profile.user.id %}" class="text-decoration-none text-muted text-center">
+              Followers
+            </a>
+          </small>
+        </div>
+        <div class="col-6">
+          <h4 class="mb-0">{{ profile.follows.count }}</h4>
+          <small class="text-muted">
+            <a href="{% url 'follows' profile.user.id %}" class="text-decoration-none text-muted text-center">
+              Following
+            </a>
+          </small>
+        </div>
+      </div>
+      
+      <!-- Button container: Update Profile or Follow/Unfollow -->
+      <div class="d-flex justify-content-center gap-2 mb-3">
+        {% if request.user.id == profile.user.id %}
+          <a href="{% url 'update_user' %}" class="btn btn-outline-primary">Update Profile</a>
+        {% else %}
+          <form method="post" class="d-inline">
+            {% csrf_token %}
+            {% if profile in request.user.profile.follows.all %}
+              <button class="btn btn-outline-danger" name="follow" value="unfollow" type="submit">Unfollow</button>
+            {% else %}
+              <button class="btn btn-outline-primary" name="follow" value="follow" type="submit">Follow</button>
+            {% endif %}
+          </form>
+        {% endif %}
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- Banters Section -->
+  {% if banters %}
+  <div class="col">
+      <div class="card-header bg-primary text-white rounded mb-2 p-1">
+          <h4 class="mb-2">
+              <i class="bi-chat-dots me-2"></i>Latest Banters
+          </h4>
+      </div>
+      <div class="banter-list">
+          {% for banter in banters %}
+          <div class="banter-item bg-white rounded p-3 mb-3 shadow-sm">
+              <div class="d-flex gap-3">
+                  <!-- Avatar -->
+                  <div class="flex-shrink-0">
+                      <a href="{% url 'profile' banter.user.id %}" class="text-decoration-none">
+                          {% if banter.user.profile.profile_image %}
+                          <img src="{{ banter.user.profile.profile_image.url }}" 
+                               class="rounded-circle border avatar" 
+                               width="56" 
+                               height="56" 
+                               alt="{{ banter.user.username }}">
+                          {% else %}
+                          <img src="{% static 'images/default_profile_pic.png' %}" 
+                               class="rounded-circle border avatar" 
+                               width="56" 
+                               height="56" 
+                               alt="{{ banter.user.username }}">
+                          {% endif %}
+                      </a>
+                  </div>
+                  <!-- Content -->
+                  <div class="flex-grow-1">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                          <div>
+                              <h6 class="mb-0 fw-bold text-dark">
+                                  {{ banter.user.get_full_name|default:banter.user.username }}
+                              </h6>
+                              <small class="text-muted">@{{ banter.user.username }}</small>
+                          </div>
+                          <small class="text-muted">{{ banter.created|timesince }} ago</small>
+                      </div>
+                      
+                      <p class="mb-2 text-dark">{{ banter.body }}</p>
+                      
+                      <div class="d-flex align-items-center gap-2">
+                          <a href="{% url 'banter_like' banter.id %}" class="btn btn-sm btn-link text-danger p-0 action-link text-decoration-none">
+                              <i class="fa-heart {% if user in banter.likes.all %}fas{% else %}far{% endif %} me-1"></i>
+                              <span class="text-muted">{{ banter.number_of_likes }}</span>
+                          </a>
+                          <span class="text-muted">·</span>
+                          <a href="{% url 'banter_show' banter.id %}" class="btn btn-sm btn-link text-muted p-0 action-link text-decoration-none">
+                              <i class="fas fa-share me-1"></i>Share
+                          </a>
+                          
+                          {% if request.user.username == profile.user.username %}
+                          <a href="{% url 'delete_banter' banter.id %}" class="btn btn-sm btn-link text-muted p-0 action-link text-decoration-none">
+                            <i class="fa-solid fa-trash"></i> Delete
+                          </a>
+                          <a href="{% url 'edit_banter' banter.id %}" class="btn btn-sm btn-link text-muted p-0 action-link text-decoration-none">
+                            <i class="fa-solid fa-pen-to-square"></i> Update
+                          </a>
+                          {% endif %}
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

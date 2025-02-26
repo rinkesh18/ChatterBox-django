@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatterBox</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .message-container {
+            height: calc(100vh - 200px);
+            min-height: 300px;
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/3bfa6bd260.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-light">
+  {% include 'navbar.html' %}
+  <div class="container">
+    <br/>
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == "error" %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {% elif message.tags == "success" %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {% else %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

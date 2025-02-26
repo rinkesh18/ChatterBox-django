@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row g-4">
+    <!-- Search Banters Card (Left Column) -->
+    <div class="col">
+        <div class="card mb-3">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">Search Users</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" >
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search banters..." aria-label="Search banters">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- (Optional) Place additional content here, e.g., a list of banters -->
+         
+         
+         {% if search %}
+            <h3>You Searched For : {{search}}</h3>
+            {% endif %}
+            
+            {% if searched %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for result in searched %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="row g-0 h-100">
+                            <!-- Profile Image -->
+                            <div class="col-md-4 d-flex align-items-center justify-content-center p-2">
+                                {% if result.profile.profile_image %}
+                                <img src="{{ result.profile.profile_image.url }}" class="img-fluid rounded-circle" alt="{{ result.profile.user.username }}" style="width: 120px; height: 120px; object-fit: cover;">
+                                {% else %}
+                                <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid rounded-circle" alt="Profile Image" style="width: 120px; height: 120px; object-fit: cover;">
+                                {% endif %}
+                            </div>
+        
+                            <!-- Profile Details -->
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ result.profile.user.username }}</h5>
+                                        <p class="card-text">
+                                        <a href="{% url 'profile' result.profile.user.id %}" class="text-decoration-none text-muted">
+                                            @{{ result.profile.user.username|lower }}
+                                        </a>
+                                    </p>
+                                    <small class="text-muted">Last Updated: {{ result.profile.date_modified }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            
+            {% if searched == None  %}
+                
+            {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                No profiles found.
+            {% endif %}
+                
+            {% endif %}
+            
+    </div>
+
+ 
+{% endblock %}
