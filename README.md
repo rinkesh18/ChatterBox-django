@@ -139,12 +139,6 @@ Fork the repository.
 - Push to the branch: `git push origin feature/my-feature`
 - Open a pull request.
 
-
-## Demo
-
-Insert gif or link to demo
-
-
 ## License
 
 [MIT](https://github.com/rinkesh18/ChatterBox-django/blob/main/LICENSE)
